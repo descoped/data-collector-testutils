@@ -1,7 +1,7 @@
 module no.ssb.dc.test {
     requires no.ssb.config;
     requires no.ssb.dc.api;
-    requires no.ssb.dc.server;
+    requires no.ssb.dc.application;
 
     requires org.slf4j;
     requires java.net.http;

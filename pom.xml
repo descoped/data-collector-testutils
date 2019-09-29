@@ -70,7 +70,7 @@
 
         <dependency>
             <groupId>no.ssb.dc</groupId>
-            <artifactId>data-collector-server</artifactId>
+            <artifactId>data-collector-server-base</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
 
