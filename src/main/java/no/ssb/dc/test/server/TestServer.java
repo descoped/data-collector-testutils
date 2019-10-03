@@ -1,7 +1,7 @@
 package no.ssb.dc.test.server;
 
 import no.ssb.config.DynamicConfiguration;
-import no.ssb.dc.api.application.Application;
+import no.ssb.dc.application.Application;
 
 import java.net.MalformedURLException;
 import java.net.URL;

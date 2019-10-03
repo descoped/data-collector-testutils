@@ -2,7 +2,7 @@ package no.ssb.dc.test.server;
 
 import no.ssb.config.DynamicConfiguration;
 import no.ssb.config.StoreBasedDynamicConfiguration;
-import no.ssb.dc.api.application.Application;
+import no.ssb.dc.application.Application;
 import no.ssb.dc.test.ConfigurationOverride;
 import no.ssb.dc.test.ConfigurationProfile;
 import no.ssb.dc.test.client.TestClient;

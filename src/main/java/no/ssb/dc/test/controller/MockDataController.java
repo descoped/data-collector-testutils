@@ -7,8 +7,8 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import no.ssb.dc.api.application.Controller;
 import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.application.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
