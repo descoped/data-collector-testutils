@@ -114,7 +114,6 @@ public class MockDataController implements Controller {
         pathElements.pollFirst();
         String id = pathElements.pollFirst();
         String mock = pathElements.pollFirst();
-        String ns = pathElements.pollFirst();
 
         if (pathElements.size() == 0 && mock.equals("mock")) {
             exchange.setStatusCode(200);
