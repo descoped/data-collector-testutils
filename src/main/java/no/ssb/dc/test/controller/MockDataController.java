@@ -7,7 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.api.util.JsonParser;
 import no.ssb.dc.application.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +69,11 @@ public class MockDataController implements Controller {
 
             exchange.setStatusCode(200);
 
-            ArrayNode arrayNode = JacksonFactory.instance().createArrayNode();
+            ArrayNode arrayNode = JsonParser.createJsonParser().createArrayNode();
 
             for (int n = cursor; n < cursor + size; n++) {
-                ObjectNode entry = JacksonFactory.instance().createObjectNode().put("id", String.valueOf(n));
-                ObjectNode eventNode = JacksonFactory.instance().createObjectNode().put("event-id", UUID.randomUUID().toString());
+                ObjectNode entry = JsonParser.createJsonParser().createObjectNode().put("id", String.valueOf(n));
+                ObjectNode eventNode = JsonParser.createJsonParser().createObjectNode().put("event-id", UUID.randomUUID().toString());
                 entry.set("event", eventNode);
                 arrayNode.add(entry);
             }
@@ -91,11 +91,11 @@ public class MockDataController implements Controller {
                     payload = payload.replace("<feed>", String.format("<feed><link rel=\"next\" href=\"%s\"/>", exchange.getRequestURL() + "?seq=" + (cursor + size) + "&amp;limit=" + size));
                 } else {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                    payload = JacksonFactory.instance().toJSON(arrayNode);
+                    payload = JsonParser.createJsonParser().toJSON(arrayNode);
                 }
             } else {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                payload = JacksonFactory.instance().toJSON(arrayNode);
+                payload = JsonParser.createJsonParser().toJSON(arrayNode);
             }
 
 
@@ -120,7 +120,7 @@ public class MockDataController implements Controller {
             exchange.setStatusCode(200);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
 
-            ObjectNode objectNode = JacksonFactory.instance().createObjectNode();
+            ObjectNode objectNode = JsonParser.createJsonParser().createObjectNode();
             objectNode.put("id", id);
             objectNode.put("type", exchange.getQueryString());
 
@@ -135,11 +135,11 @@ public class MockDataController implements Controller {
                     payload = mapper.writeValueAsString(objectNode).replace("ObjectNode", "entry");
                 } else {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                    payload = JacksonFactory.instance().toJSON(objectNode);
+                    payload = JsonParser.createJsonParser().toJSON(objectNode);
                 }
             } else {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                payload = JacksonFactory.instance().toJSON(objectNode);
+                payload = JsonParser.createJsonParser().toJSON(objectNode);
             }
 
             randomNap(150);
