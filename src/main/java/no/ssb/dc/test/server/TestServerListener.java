@@ -2,7 +2,6 @@ package no.ssb.dc.test.server;
 
 import no.ssb.config.DynamicConfiguration;
 import no.ssb.config.StoreBasedDynamicConfiguration;
-import no.ssb.dc.application.Application;
 import no.ssb.dc.test.ConfigurationOverride;
 import no.ssb.dc.test.ConfigurationProfile;
 import no.ssb.dc.test.client.TestClient;
@@ -180,7 +179,7 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
             profile = "TEST_DEFAULT";
         }
         StoreBasedDynamicConfiguration.Builder builder = new StoreBasedDynamicConfiguration.Builder()
-                .propertiesResource(Application.getDefaultConfigurationResourcePath())
+                .propertiesResource("application-defaults.properties")
                 .propertiesResource("application-test.properties");
         if (configurationOverride != null) {
             builder.values(configurationOverride.value());

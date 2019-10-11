@@ -1,7 +1,7 @@
 package no.ssb.dc.test.server;
 
 import no.ssb.config.DynamicConfiguration;
-import no.ssb.dc.application.Application;
+import no.ssb.dc.application.UndertowApplication;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,14 +10,14 @@ public class TestServer implements TestUriResolver {
 
     private final DynamicConfiguration configuration;
 
-    private final Application application;
+    private final UndertowApplication application;
 
     private final int testServerServicePort;
 
     public TestServer(DynamicConfiguration configuration, int testServerServicePort) {
         this.configuration = configuration;
         this.testServerServicePort = testServerServicePort;
-        application = Application.create(configuration, testServerServicePort);
+        application = UndertowApplication.initializeUndertowApplication(configuration, testServerServicePort);
     }
 
     public void start() {
@@ -50,7 +50,7 @@ public class TestServer implements TestUriResolver {
         return configuration;
     }
 
-    public Application getApplication() {
+    public UndertowApplication getApplication() {
         return application;
     }
 
