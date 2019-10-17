@@ -116,6 +116,11 @@ public class MockDataController implements Controller {
         String mock = pathElements.pollFirst();
 
         if (pathElements.size() == 0 && mock.equals("mock")) {
+
+//            if (true) {
+//                exchange.setStatusCode(404);
+//                return;
+//            }
             exchange.setStatusCode(200);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
 
