@@ -42,7 +42,7 @@ public class TestServer implements TestUriResolver {
             URL url = new URL("http", application.getHost(), application.getPort(), uri);
             return url.toExternalForm();
         } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+            throw new TestServerException(e);
         }
     }
 

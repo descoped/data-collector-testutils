@@ -64,7 +64,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -80,7 +80,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -100,7 +100,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -120,7 +120,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -133,7 +133,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -146,7 +146,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -162,7 +162,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 
@@ -178,7 +178,7 @@ public final class TestClient {
             return new ResponseHelper<>(client.send(request, bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
-            throw new RuntimeException(e);
+            throw new TestClientException(e);
         }
     }
 }

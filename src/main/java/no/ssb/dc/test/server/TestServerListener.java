@@ -215,7 +215,7 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
                         field.set(test, startOrGetServer(configuration));
                     }
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    throw new TestServerException(e);
                 }
             }
             // test client
@@ -226,7 +226,7 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
                         field.set(test, TestClient.newClient(startOrGetServer(configuration)));
                     }
                 } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
+                    throw new TestServerException(e);
                 }
             }
         }

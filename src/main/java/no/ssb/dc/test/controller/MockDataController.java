@@ -9,6 +9,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 import no.ssb.dc.api.util.JsonParser;
 import no.ssb.dc.application.Controller;
+import no.ssb.dc.test.server.TestServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class MockDataController implements Controller {
     String getResource(String filename) throws IOException {
         try (InputStream in = ClassLoader.getSystemResourceAsStream("testdata/" + filename)) {
             if (in == null) {
-                throw new RuntimeException("Unable to locate resource: " + "testdata/" + filename);
+                throw new TestServerException("Unable to locate resource: " + "testdata/" + filename);
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
@@ -162,7 +163,7 @@ public class MockDataController implements Controller {
             int randomInt = 50 + new Random().nextInt(maxTimeInMillis - 50 + 1);
             Thread.sleep(randomInt);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new TestServerException(e);
         }
     }
 
