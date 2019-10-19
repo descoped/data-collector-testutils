@@ -51,7 +51,7 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
         return testName.substring(index + 1);
     }
 
-    public static int findFreePort(Random random, int from, int to) {
+    private static int findFreePort(Random random, int from, int to) {
         int port = pick(random, from, to);
         for (int i = 0; i < 2 * ((to + 1) - from); i++) {
             if (isLocalPortFree(port)) {
@@ -75,11 +75,11 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
         }
     }
 
-    public void addProfile(String profile, DynamicConfiguration configuration) {
+    private void addProfile(String profile, DynamicConfiguration configuration) {
         configurationByProfile.put(profile, configuration);
     }
 
-    public DynamicConfiguration configurationInstance(String profile) {
+    private DynamicConfiguration configurationInstance(String profile) {
         return configurationByProfile.get(profile);
     }
 
@@ -118,7 +118,7 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
         serverByConfiguration.values().forEach(server -> {
             try {
                 server.stop();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 LOG.error("Error stopping server!\n{}", e);
             }
         });
@@ -133,13 +133,13 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
                     .forEach((k, v) -> {
                         sb.append(String.format("\t%s: %sms\n", shortName(k), v));
                     });
-            if (LOG.isDebugEnabled()) LOG.debug("Test execution time profiling:{}", sb.toString());
+            if (LOG.isDebugEnabled()) LOG.debug("Test execution time profiling:{}", sb);
         }
     }
 
     private TestServer startOrGetServer(DynamicConfiguration config) {
+        Random random = new Random();
         return serverByConfiguration.computeIfAbsent(config, configuration -> {
-            Random random = new Random();
             int testServerServicePort = findFreePort(random, 9000, 9499);
             TestServer server = new TestServer(configuration, testServerServicePort);
             server.start();
