@@ -51,7 +51,7 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
         return testName.substring(index + 1);
     }
 
-    private static int findFreePort(Random random, int from, int to) {
+    static int findFreePort(Random random, int from, int to) {
         int port = pick(random, from, to);
         for (int i = 0; i < 2 * ((to + 1) - from); i++) {
             if (isLocalPortFree(port)) {
