@@ -109,14 +109,13 @@ public class MockDataController implements Controller {
         } /* end mock list */
 
 
-        NavigableSet<String> pathElements = new TreeSet<>();
-        pathElements.addAll(Arrays.asList(requestPath.split("/")));
+        NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
 
         pathElements.pollFirst();
         String id = pathElements.pollFirst();
         String mock = pathElements.pollFirst();
 
-        if (pathElements.size() == 0 && mock.equals("mock")) {
+        if (pathElements.isEmpty() && "mock".equals(mock)) {
 
 //            if (true) {
 //                exchange.setStatusCode(404);

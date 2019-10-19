@@ -33,6 +33,11 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
     private static final Logger LOG = LoggerFactory.getLogger(TestServerListener.class);
     private static final Map<String, Long> timeStartProfilerMap = new ConcurrentHashMap<>(500);
     private static final Map<String, Long> timeStopProfilerMap = new ConcurrentHashMap<>(500);
+    private final ThreadLocal<DynamicConfiguration> configurationThreadLocal = new ThreadLocal<>();
+    private final Map<DynamicConfiguration, TestServer> serverByConfiguration = new ConcurrentHashMap<>();
+    private final Set<String> testclassHistory = new ConcurrentSkipListSet<>();
+    private final ThreadLocal<String> currentTestClazz = new ThreadLocal<>();
+    private final Map<String, DynamicConfiguration> configurationByProfile = new ConcurrentHashMap<>();
 
     private static String shortName(final String testName) {
         int match = 2;
@@ -46,12 +51,29 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
         return testName.substring(index + 1);
     }
 
-    private final ThreadLocal<DynamicConfiguration> configurationThreadLocal = new ThreadLocal<>();
-    private final Map<DynamicConfiguration, TestServer> serverByConfiguration = new ConcurrentHashMap<>();
-    private final Set<String> testclassHistory = new ConcurrentSkipListSet<>();
-    private final ThreadLocal<String> currentTestClazz = new ThreadLocal<>();
+    public static int findFreePort(Random random, int from, int to) {
+        int port = pick(random, from, to);
+        for (int i = 0; i < 2 * ((to + 1) - from); i++) {
+            if (isLocalPortFree(port)) {
+                return port;
+            }
+            port = pick(random, from, to);
+        }
+        throw new IllegalStateException("Unable to find any available ports in range: [" + from + ", " + (to + 1) + ")");
+    }
 
-    private final Map<String, DynamicConfiguration> configurationByProfile = new ConcurrentHashMap<>();
+    private static int pick(Random random, int from, int to) {
+        return from + random.nextInt((to + 1) - from);
+    }
+
+    private static boolean isLocalPortFree(int port) {
+        try {
+            new ServerSocket(port).close();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 
     public void addProfile(String profile, DynamicConfiguration configuration) {
         configurationByProfile.put(profile, configuration);
@@ -61,32 +83,29 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
         return configurationByProfile.get(profile);
     }
 
-    public TestServerListener() {
-    }
-
     @Override
     public void onTestStart(ITestResult result) {
-
+        // nop
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-
+        // nop
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-
+        // nop
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-
+        // nop
     }
 
     @Override
     public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-
+        // nop
     }
 
     @Override
@@ -126,30 +145,6 @@ public class TestServerListener implements ITestListener, IInvokedMethodListener
             server.start();
             return server;
         });
-    }
-
-    public static int findFreePort(Random random, int from, int to) {
-        int port = pick(random, from, to);
-        for (int i = 0; i < 2 * ((to + 1) - from); i++) {
-            if (isLocalPortFree(port)) {
-                return port;
-            }
-            port = pick(random, from, to);
-        }
-        throw new IllegalStateException("Unable to find any available ports in range: [" + from + ", " + (to + 1) + ")");
-    }
-
-    private static int pick(Random random, int from, int to) {
-        return from + random.nextInt((to + 1) - from);
-    }
-
-    private static boolean isLocalPortFree(int port) {
-        try {
-            new ServerSocket(port).close();
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
     }
 
     @Override
