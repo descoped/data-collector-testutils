@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import no.ssb.dc.api.http.Request;
 import no.ssb.dc.api.util.JsonParser;
 import no.ssb.dc.application.Controller;
 import no.ssb.dc.test.server.TestServerException;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.NavigableSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -31,6 +33,11 @@ public class MockDataController implements Controller {
     @Override
     public String contextPath() {
         return "/mock";
+    }
+
+    @Override
+    public Set<Request.Method> allowedMethods() {
+        return Set.of(Request.Method.GET);
     }
 
     String getResource(String filename) throws IOException {
@@ -84,9 +91,10 @@ public class MockDataController implements Controller {
             if (exchange.getRequestHeaders().contains("Accept")) {
                 if ("application/xml".equalsIgnoreCase(exchange.getRequestHeaders().getFirst("Accept"))) {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/xml");
-                    XmlMapper mapper = new XmlMapper();
-                    mapper.setDefaultUseWrapper(false);
-                    mapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+                    XmlMapper mapper = XmlMapper.builder()
+                            .defaultUseWrapper(false)
+                            .configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true)
+                            .build();
                     JsonNode feedNode = mapper.createObjectNode().set("entry", arrayNode);
                     payload = mapper.writeValueAsString(feedNode).replace("ObjectNode", "feed");
                     payload = payload.replace("<feed>", String.format("<feed><link rel=\"next\" href=\"%s\"/>", exchange.getRequestURL() + "?seq=" + (cursor + size) + "&amp;limit=" + size));
@@ -98,7 +106,6 @@ public class MockDataController implements Controller {
                 exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
                 payload = JsonParser.createJsonParser().toJSON(arrayNode);
             }
-
 
             exchange.startBlocking();
             exchange.getOutputStream().write(payload.getBytes());
@@ -133,9 +140,10 @@ public class MockDataController implements Controller {
             if (exchange.getRequestHeaders().contains("Accept")) {
                 if ("application/xml".equalsIgnoreCase(exchange.getRequestHeaders().getFirst("Accept"))) {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/xml");
-                    XmlMapper mapper = new XmlMapper();
-                    mapper.setDefaultUseWrapper(false);
-                    mapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+                    XmlMapper mapper = XmlMapper.builder()
+                            .defaultUseWrapper(false)
+                            .configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true)
+                            .build();
                     payload = mapper.writeValueAsString(objectNode).replace("ObjectNode", "entry");
                 } else {
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
