@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,6 +48,10 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
     boolean compareAndIfInjectionPointExistsSetFieldValue(Object expect, Field field, Object instance, Object value) {
         if (field.isAnnotationPresent(Inject.class) && value.getClass().isAssignableFrom(field.getType())) {
             try {
+                if (Modifier.isFinal(field.getModifiers())) {
+                    throw new IllegalAccessException("Illegal access to final field: " + instance.getClass().getName() + "." + field.getName());
+                }
+                field.setAccessible(true);
                 if (field.get(instance) == expect) {
                     field.set(instance, value);
                     return true;

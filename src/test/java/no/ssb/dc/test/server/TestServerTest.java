@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestServerTest {
 
     @Test
-    public void testName() throws InterruptedException {
+    public void testServer() throws InterruptedException {
         DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
                 .values("http.host", "0.0.0.0")
                 .values("http.cors.allow.origin", ".*")
@@ -26,7 +26,8 @@ public class TestServerTest {
                 .values("http.cors.allow.max-age", "900")
                 .build();
 
-        int testServerServicePort = TestServerListener.findFreePort(new Random(), 9000, 9499);
+        TestServerFactory testServerFactory = new TestServerFactory(null);
+        int testServerServicePort = testServerFactory.findFreePort(new Random(), 9000, 9499);
         Phaser phaser = new Phaser(1);
         TestServer testServer = new TestServer(configuration, testServerServicePort);
         testServer.start();
