@@ -31,13 +31,16 @@ import static java.util.Optional.ofNullable;
 public class TestServerListener implements ITestListener, IInvokedMethodListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestServerListener.class);
+
     private static final Map<String, Long> timeStartProfilerMap = new ConcurrentHashMap<>(500);
     private static final Map<String, Long> timeStopProfilerMap = new ConcurrentHashMap<>(500);
+
     private final ThreadLocal<DynamicConfiguration> configurationThreadLocal = new ThreadLocal<>();
     private final Map<DynamicConfiguration, TestServer> serverByConfiguration = new ConcurrentHashMap<>();
     private final Set<String> testclassHistory = new ConcurrentSkipListSet<>();
     private final ThreadLocal<String> currentTestClazz = new ThreadLocal<>();
     private final Map<String, DynamicConfiguration> configurationByProfile = new ConcurrentHashMap<>();
+
 
     private static String shortName(final String testName) {
         int match = 2;

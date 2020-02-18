@@ -69,6 +69,12 @@
         </dependency>
 
         <dependency>
+            <groupId>no.ssb.config</groupId>
+            <artifactId>dynamic-configuration</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>no.ssb.dc</groupId>
             <artifactId>data-collector-server-base</artifactId>
             <version>0.1-SNAPSHOT</version>
@@ -127,6 +133,20 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.5.2</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.5.2</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

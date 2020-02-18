@@ -6,10 +6,6 @@ public class TestServerException extends RuntimeException {
         super(message);
     }
 
-    public TestServerException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public TestServerException(Throwable cause) {
         super(cause);
     }

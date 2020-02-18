@@ -30,6 +30,12 @@ public class MockDataController implements Controller {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockDataController.class);
 
+    private static final String STATUS_404_WITH_CUSTOM_ERROR = "{" +
+            "  \"kode\": \"SP-002\"," +
+            "  \"melding\": \"identifikator har ugyldig format. Forventet en personidentifikator på 11 siffer\"," +
+            "  \"korrelasjonsid\": \"b0e88d88ab83b3cd417d2ee88a696afb\" " +
+            "}";
+
     @Override
     public String contextPath() {
         return "/mock";
@@ -128,6 +134,14 @@ public class MockDataController implements Controller {
 //                exchange.setStatusCode(404);
 //                return;
 //            }
+
+            if (exchange.getQueryParameters().containsKey("404withResponseError")) {
+                exchange.setStatusCode(404);
+                exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                exchange.getResponseSender().send(STATUS_404_WITH_CUSTOM_ERROR);
+                return;
+            }
+
             exchange.setStatusCode(200);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
 
