@@ -1,8 +1,8 @@
 package no.ssb.dc.test.server;
 
-import no.ssb.dc.test.ConfigurationOverride;
-import no.ssb.dc.test.ConfigurationProfile;
 import no.ssb.dc.test.client.TestClient;
+import no.ssb.dc.test.config.ConfigurationOverride;
+import no.ssb.dc.test.config.ConfigurationProfile;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;

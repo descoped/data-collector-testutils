@@ -1,4 +1,4 @@
-package no.ssb.dc.test;
+package no.ssb.dc.test.config;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

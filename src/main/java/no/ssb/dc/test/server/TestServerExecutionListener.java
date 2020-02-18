@@ -1,7 +1,7 @@
 package no.ssb.dc.test.server;
 
-import no.ssb.dc.test.ConfigurationOverride;
-import no.ssb.dc.test.ConfigurationProfile;
+import no.ssb.dc.test.config.ConfigurationOverride;
+import no.ssb.dc.test.config.ConfigurationProfile;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.commons.support.HierarchyTraversalMode;
 import org.junit.platform.commons.support.ReflectionSupport;
