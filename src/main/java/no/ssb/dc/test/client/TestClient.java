@@ -150,16 +150,18 @@ public final class TestClient {
         }
     }
 
-    public ResponseHelper<String> get(String uri) {
-        return get(uri, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+    public ResponseHelper<String> get(String uri, String... headers) {
+        return get(uri, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8), headers);
     }
 
-    public <R> ResponseHelper<R> get(String uri, HttpResponse.BodyHandler<R> bodyHandler) {
+    public <R> ResponseHelper<R> get(String uri, HttpResponse.BodyHandler<R> bodyHandler, String... headers) {
         try {
-            HttpRequest request = HttpRequest.newBuilder(URI.create(server.testURL(uri)))
-                    .GET()
-                    .build();
-            return new ResponseHelper<>(client.send(request, bodyHandler));
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(URI.create(server.testURL(uri)))
+                    .GET();
+            if (headers.length > 0) {
+                requestBuilder.headers(headers);
+            }
+            return new ResponseHelper<>(client.send(requestBuilder.build(), bodyHandler));
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
             throw new TestClientException(e);
