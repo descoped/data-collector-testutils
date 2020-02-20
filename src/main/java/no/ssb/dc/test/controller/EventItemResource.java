@@ -19,7 +19,7 @@ class EventItemResource extends AbstractResource {
         Optional<String> contentTypeHeader = getContentTypeHeader(exchange);
 
         if (contentTypeHeader.isEmpty() || contentTypeHeader.orElseThrow().equals("application/json")) {
-            if (checkHttpError404WithExplanation(exchange)) {
+            if (checkHttpError404WithExplanation(exchange, contentTypeHeader)) {
                 return;
             }
             String payload = renderEventItemAsJson(position);
@@ -29,7 +29,7 @@ class EventItemResource extends AbstractResource {
             return;
 
         } else if (contentTypeHeader.orElseThrow().equals("application/xml")) {
-            if (checkHttpError404WithExplanation(exchange)) {
+            if (checkHttpError404WithExplanation(exchange, contentTypeHeader)) {
                 return;
             }
             String payload = renderEventItemAsXml(position);
@@ -54,18 +54,32 @@ class EventItemResource extends AbstractResource {
         return compactJson(output.toString());
     }
 
-    boolean checkHttpError404WithExplanation(HttpServerExchange exchange) {
+    boolean checkHttpError404WithExplanation(HttpServerExchange exchange, Optional<String> contentTypeHeader) {
+        String contentType = contentTypeHeader.orElseThrow();
         if (exchange.getQueryParameters().containsKey("404withResponseError")) {
-            String payload = renderHttpError404WithExplaination();
+            String payload;
+            if ("application/json".equals(contentType)) {
+                payload = renderHttpError404WithExplanationAsJson();
+            } else if ("application/xml".equals(contentType)) {
+                payload = renderHttpError404WithExplanationAsXml();
+            } else {
+                payload = "BodyContains content-type: " + contentType + " not supported: " + exchange.getRequestPath();
+                contentType = "text/plain";
+            }
             exchange.setStatusCode(404);
-            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);
             exchange.getResponseSender().send(payload);
             return true;
         }
         return false;
     }
 
-    String renderHttpError404WithExplaination() {
+    String renderHttpError404WithExplanationAsXml() {
+        StringWriter output = renderTemplate("event-item-404-error-response-xml.ftl", new HashMap<>());
+        return compactXml(output.toString());
+    }
+
+    String renderHttpError404WithExplanationAsJson() {
         StringWriter output = renderTemplate("event-item-404-error-response-json.ftl", new HashMap<>());
         return compactJson(output.toString());
     }

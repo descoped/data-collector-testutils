@@ -79,8 +79,14 @@ public class MockDataControllerTest {
     }
 
     @Test
-    public void testMockItemsWith404ErrorResponse() {
+    public void testMockItemsWith404ErrorResponseAsJson() {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5?404withResponseError").expect404NotFound();
+        LOG.trace("{}", eventsResponse.body());
+    }
+
+    @Test
+    public void testMockItemsWith404ErrorResponseAsXml() {
+        ResponseHelper<String> eventsResponse = client.get("/api/events/5?404withResponseError", "Accept", "application/xml").expect404NotFound();
         LOG.trace("{}", eventsResponse.body());
     }
 }

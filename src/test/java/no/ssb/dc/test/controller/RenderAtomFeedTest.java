@@ -12,11 +12,11 @@ import java.util.Map;
 
 public class RenderAtomFeedTest {
 
-    private static RenderEventListTest.DummyResource resource;
+    private static MockResource mockResource;
 
     @BeforeAll
     static void beforeAll() {
-        resource = new RenderEventListTest.DummyResource();
+        mockResource = new MockResource();
     }
 
     Map<String, Object> getListDataModel(int fromPosition, int pageSize, int stopAt) {
@@ -47,13 +47,13 @@ public class RenderAtomFeedTest {
 
         listDataModel.put("fromPosition", String.valueOf(1000));
 
-        StringWriter output = resource.renderTemplate("atom-feed-xml.ftl", listDataModel);
-        String xml = resource.compactXml(output.toString());
-        xml = resource.prettyXml(xml);
+        StringWriter output = mockResource.renderTemplate("atom-feed-xml.ftl", listDataModel);
+        String xml = mockResource.compactXml(output.toString());
+        xml = mockResource.prettyXml(xml);
         System.out.printf("%s%n", xml);
     }
 
-    static class DummyResource extends AbstractResource {
+    static class MockResource extends AbstractResource {
         @Override
         void handle(HttpServerExchange exchange) {
             // NOP
