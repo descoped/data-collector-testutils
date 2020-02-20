@@ -17,10 +17,11 @@ import java.util.TreeSet;
 public class MockDataController implements Controller {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockDataController.class);
+    static final int ROOT_CONTEXT_PATH_ELEMENT_COUNT = 2; // requestPath is split to: [/, api, events]. Value of 2 means skip [/, api]
 
     @Override
     public String contextPath() {
-        return "/events";
+        return "/api";
     }
 
     @Override
@@ -31,13 +32,13 @@ public class MockDataController implements Controller {
     boolean isListResourceWithContext(HttpServerExchange exchange, String endsWithContext) {
         String requestPath = exchange.getRequestPath();
         NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
-        return pathElements.size() - 1 == 1 && requestPath.endsWith(endsWithContext);
+        return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == 1 && requestPath.endsWith(endsWithContext);
     }
 
     boolean isItemResourceWithContext(HttpServerExchange exchange, String endsWithContext, int pathElementCount) {
         String requestPath = exchange.getRequestPath();
         NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
-        return pathElements.size() - 1 == pathElementCount && endsWithContext.substring(1).equalsIgnoreCase(pathElements.pollLast());
+        return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == pathElementCount && endsWithContext.substring(1).equalsIgnoreCase(pathElements.pollLast());
     }
 
     @Override
@@ -47,11 +48,11 @@ public class MockDataController implements Controller {
             return;
         }
 
-        if (isListResourceWithContext(exchange, contextPath())) {
+        if (isListResourceWithContext(exchange, "/events")) {
             new EventListResource().handle(exchange);
             return;
 
-        } else if (isItemResourceWithContext(exchange, contextPath(), 2)) {
+        } else if (isItemResourceWithContext(exchange, "/events", 2)) {
             new EventItemResource().handle(exchange);
             return;
         }

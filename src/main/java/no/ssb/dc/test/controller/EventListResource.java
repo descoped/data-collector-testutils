@@ -7,11 +7,12 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Optional;
 
-class EventListResource extends AbstractFeedResource {
+class EventListResource extends AbstractResource {
 
     EventListResource() {
     }
 
+    @Override
     void handle(HttpServerExchange exchange) {
         int position = getQueryParam(exchange.getQueryParameters(), "position", 1);
         int pageSize = getQueryParam(exchange.getQueryParameters(), "pageSize", 50);

@@ -7,11 +7,12 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Optional;
 
-class EventItemResource extends AbstractFeedResource {
+class EventItemResource extends AbstractResource {
 
     EventItemResource() {
     }
 
+    @Override
     void handle(HttpServerExchange exchange) {
         int position = getPathParam(exchange.getRequestPath(), 1, 1);
 
