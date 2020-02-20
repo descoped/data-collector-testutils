@@ -4,6 +4,9 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,6 +45,18 @@ class EventListResource extends AbstractResource {
         exchange.setStatusCode(404);
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         exchange.getResponseSender().send("Not found: " + exchange.getRequestPath());
+    }
+
+    Map<String, Object> getListDataModel(int fromPosition, int pageSize, int stopAt) {
+        Map<String, Object> dataModel = new HashMap<>();
+        List<EventListItem> list = new ArrayList<>();
+        if (stopAt == -1 || fromPosition < stopAt) {
+            for (int n = fromPosition; n < fromPosition + pageSize; n++) {
+                list.add(new EventListItem(n, String.valueOf(n + 1000)));
+            }
+        }
+        dataModel.put("list", list);
+        return dataModel;
     }
 
     String renderEventListAsXml(int fromPosition, int pageSize, int stopAt, String linkNextURL) {

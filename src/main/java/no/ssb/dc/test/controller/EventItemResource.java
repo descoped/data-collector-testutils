@@ -5,6 +5,7 @@ import io.undertow.util.Headers;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 class EventItemResource extends AbstractResource {
@@ -44,6 +45,12 @@ class EventItemResource extends AbstractResource {
         exchange.getResponseSender().send("Not found: " + exchange.getRequestPath());
     }
 
+    Map<String, Object> getItemDataModel(int position) {
+        Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("item", new EventListItem(position, String.valueOf(position + 1000)));
+        return dataModel;
+    }
+
     String renderEventItemAsXml(int position) {
         StringWriter output = renderTemplate("event-list-item-xml.ftl", getItemDataModel(position));
         return compactXml(output.toString());
@@ -55,16 +62,13 @@ class EventItemResource extends AbstractResource {
     }
 
     boolean checkHttpError404WithExplanation(HttpServerExchange exchange, Optional<String> contentTypeHeader) {
-        String contentType = contentTypeHeader.orElseThrow();
+        String contentType = contentTypeHeader.orElse("application/json");
         if (exchange.getQueryParameters().containsKey("404withResponseError")) {
-            String payload;
+            String payload = null;
             if ("application/json".equals(contentType)) {
                 payload = renderHttpError404WithExplanationAsJson();
             } else if ("application/xml".equals(contentType)) {
                 payload = renderHttpError404WithExplanationAsXml();
-            } else {
-                payload = "BodyContains content-type: " + contentType + " not supported: " + exchange.getRequestPath();
-                contentType = "text/plain";
             }
             exchange.setStatusCode(404);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);

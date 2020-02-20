@@ -18,6 +18,5 @@ class AtomFeedResource extends AbstractResource {
         String marker = getQueryParam(exchange.getQueryParameters(), "marker", "last");
 
 
-
     }
 }

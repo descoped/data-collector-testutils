@@ -1,6 +1,5 @@
 package no.ssb.dc.test.controller;
 
-import io.undertow.server.HttpServerExchange;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -10,13 +9,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RenderAtomFeedTest {
+class RenderAtomFeedTest {
 
-    private static MockResource mockResource;
+    private static AtomFeedResource atomFeedResource;
 
     @BeforeAll
     static void beforeAll() {
-        mockResource = new MockResource();
+        atomFeedResource = new AtomFeedResource();
     }
 
     Map<String, Object> getListDataModel(int fromPosition, int pageSize, int stopAt) {
@@ -47,16 +46,10 @@ public class RenderAtomFeedTest {
 
         listDataModel.put("fromPosition", String.valueOf(1000));
 
-        StringWriter output = mockResource.renderTemplate("atom-feed-xml.ftl", listDataModel);
-        String xml = mockResource.compactXml(output.toString());
-        xml = mockResource.prettyXml(xml);
+        StringWriter output = atomFeedResource.renderTemplate("atom-feed-xml.ftl", listDataModel);
+        String xml = atomFeedResource.compactXml(output.toString());
+        xml = atomFeedResource.prettyXml(xml);
         System.out.printf("%s%n", xml);
     }
 
-    static class MockResource extends AbstractResource {
-        @Override
-        void handle(HttpServerExchange exchange) {
-            // NOP
-        }
-    }
 }
