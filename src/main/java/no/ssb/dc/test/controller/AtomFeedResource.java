@@ -2,6 +2,8 @@ package no.ssb.dc.test.controller;
 
 import io.undertow.server.HttpServerExchange;
 
+import java.util.Optional;
+
 
 /**
  * The mock feed simulates an atom feed and only support forward direction of data.
@@ -17,6 +19,7 @@ class AtomFeedResource extends AbstractResource {
     void handle(HttpServerExchange exchange) {
         String marker = getQueryParam(exchange.getQueryParameters(), "marker", "last");
 
+        Optional<String> contentTypeHeader = getContentTypeHeader(exchange);
 
     }
 }
