@@ -92,6 +92,14 @@ abstract class AbstractResource {
         return queryParameters.computeIfAbsent(paramName, key -> new LinkedList<>(Collections.singletonList(defaultValue))).getFirst();
     }
 
+    String getQueryParam(Map<String, Deque<String>> queryParameters, String paramName, String defaultValue, String mapToDefaultValue) {
+        String value = queryParameters.computeIfAbsent(paramName, key -> new LinkedList<>(Collections.singletonList(defaultValue))).getFirst();
+        if (value.equals(mapToDefaultValue)) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
     int getPathParam(String requestPath, int pathIndex, int defaultValue) {
         List<String> pathElements = Arrays.asList(requestPath.split("/")).stream().skip(MockDataController.ROOT_CONTEXT_PATH_ELEMENT_COUNT).collect(Collectors.toList());
 
