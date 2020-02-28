@@ -55,6 +55,10 @@ public class MockDataController implements Controller {
         } else if (isItemResourceWithContext(exchange, "/events", 2)) {
             new EventItemResource().handle(exchange);
             return;
+
+        } else if (isListResourceWithContext(exchange, "/atom")) {
+            new AtomFeedResource().handle(exchange);
+            return;
         }
 
         exchange.setStatusCode(404);

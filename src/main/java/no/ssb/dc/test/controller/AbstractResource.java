@@ -26,11 +26,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +92,14 @@ abstract class AbstractResource {
         return queryParameters.computeIfAbsent(paramName, key -> new LinkedList<>(Collections.singletonList(defaultValue))).getFirst();
     }
 
+    String getQueryParam(Map<String, Deque<String>> queryParameters, String paramName, String defaultValue, String mapToDefaultValue) {
+        String value = queryParameters.computeIfAbsent(paramName, key -> new LinkedList<>(Collections.singletonList(defaultValue))).getFirst();
+        if (value.equals(mapToDefaultValue)) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
     int getPathParam(String requestPath, int pathIndex, int defaultValue) {
         List<String> pathElements = Arrays.asList(requestPath.split("/")).stream().skip(MockDataController.ROOT_CONTEXT_PATH_ELEMENT_COUNT).collect(Collectors.toList());
 
@@ -112,24 +118,6 @@ abstract class AbstractResource {
         PrintWriter writer = new PrintWriter(output);
         engine.process(templateFile, dataModel, writer);
         return output;
-    }
-
-    Map<String, Object> getListDataModel(int fromPosition, int pageSize, int stopAt) {
-        Map<String, Object> dataModel = new HashMap<>();
-        List<EventListItem> list = new ArrayList<>();
-        if (stopAt == -1 || fromPosition < stopAt) {
-            for (int n = fromPosition; n < fromPosition + pageSize; n++) {
-                list.add(new EventListItem(n, String.valueOf(n + 1000)));
-            }
-        }
-        dataModel.put("list", list);
-        return dataModel;
-    }
-
-    Map<String, Object> getItemDataModel(int position) {
-        Map<String, Object> dataModel = new HashMap<>();
-        dataModel.put("item", new EventListItem(position, String.valueOf(position + 1000)));
-        return dataModel;
     }
 
     String compactXml(String xml) {

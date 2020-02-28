@@ -16,12 +16,12 @@
     <author>
         <name>Mock Atom Feed</name>
     </author>
-    <id>urn:uuid:${fromPosition}</id>
+    <id>urn:uuid:${fromMarker}</id>
 
     <#list entries as entry>
     <entry>
         <title>Atom feed message #${entry.eventId}</title>
-        <link href="http://example.org/2003/12/13/atom03"/>
+        <link rel="self" href="http://example.org/2003/12/13/atom03"/>
         <id>urn:uuid:${entry.eventId}</id>
         <updated>${.now?iso_utc}</updated>
         <summary>Message document</summary>

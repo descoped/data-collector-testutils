@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(TestServerExtension.class)
-public class MockDataControllerTest {
+class MockDataControllerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockDataControllerTest.class);
 
@@ -27,7 +27,7 @@ public class MockDataControllerTest {
     TestClient client;
 
     @Test
-    public void testMockCursorForJson() {
+    void testMockCursorForJson() {
         String cursor = "1";
         int size = 10;
         ResponseHelper<String> eventsResponse = client.get(String.format("/api/events?position=%s&pageSize=%s", cursor, size)).expect200Ok();
@@ -38,7 +38,7 @@ public class MockDataControllerTest {
     }
 
     @Test
-    public void testMockCursorAndStopAtForJson() {
+    void testMockCursorAndStopAtForJson() {
         String cursor = "31";
         int size = 10;
         ResponseHelper<String> eventsResponse = client.get(String.format("/api/events?position=%s&pageSize=%s&stopAt=25", cursor, size)).expect200Ok();
@@ -48,7 +48,7 @@ public class MockDataControllerTest {
     }
 
     @Test
-    public void testMockCursorForXml() {
+    void testMockCursorForXml() {
         String cursor = "1";
         int size = 10;
         ResponseHelper<String> eventsResponse = client.get(String.format("/api/events?position=%s&pageSize=%s", cursor, size), "Accept", "application/xml").expect200Ok();
@@ -60,7 +60,7 @@ public class MockDataControllerTest {
     }
 
     @Test
-    public void testMockCursorAndStopAtForXml() {
+    void testMockCursorAndStopAtForXml() {
         String cursor = "31";
         int size = 10;
         ResponseHelper<String> eventsResponse = client.get(String.format("/api/events?position=%s&pageSize=%s&stopAt=25", cursor, size), "Accept", "application/xml").expect200Ok();
@@ -72,20 +72,20 @@ public class MockDataControllerTest {
 
 
     @Test
-    public void testMockItems() {
+    void testMockItems() {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5").expect200Ok();
         ObjectNode objectNode = JsonParser.createJsonParser().fromJson(eventsResponse.body(), ObjectNode.class);
         assertEquals("5", objectNode.get("id").asText());
     }
 
     @Test
-    public void testMockItemsWith404ErrorResponseAsJson() {
+    void testMockItemsWith404ErrorResponseAsJson() {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5?404withResponseError").expect404NotFound();
         LOG.trace("{}", eventsResponse.body());
     }
 
     @Test
-    public void testMockItemsWith404ErrorResponseAsXml() {
+    void testMockItemsWith404ErrorResponseAsXml() {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5?404withResponseError", "Accept", "application/xml").expect404NotFound();
         LOG.trace("{}", eventsResponse.body());
     }

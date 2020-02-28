@@ -5,6 +5,7 @@ import io.undertow.util.Headers;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 class EventItemResource extends AbstractResource {
@@ -17,9 +18,10 @@ class EventItemResource extends AbstractResource {
         int position = getPathParam(exchange.getRequestPath(), 1, 1);
 
         Optional<String> contentTypeHeader = getContentTypeHeader(exchange);
+        String contentType = contentTypeHeader.orElse("application/json");
 
-        if (contentTypeHeader.isEmpty() || contentTypeHeader.orElseThrow().equals("application/json")) {
-            if (checkHttpError404WithExplanation(exchange, contentTypeHeader)) {
+        if ("application/json".equals(contentType)) {
+            if (checkHttpError404WithExplanation(exchange, contentType)) {
                 return;
             }
             String payload = renderEventItemAsJson(position);
@@ -28,8 +30,8 @@ class EventItemResource extends AbstractResource {
             exchange.getResponseSender().send(payload);
             return;
 
-        } else if (contentTypeHeader.orElseThrow().equals("application/xml")) {
-            if (checkHttpError404WithExplanation(exchange, contentTypeHeader)) {
+        } else if ("application/xml".equals(contentType)) {
+            if (checkHttpError404WithExplanation(exchange, contentType)) {
                 return;
             }
             String payload = renderEventItemAsXml(position);
@@ -44,6 +46,12 @@ class EventItemResource extends AbstractResource {
         exchange.getResponseSender().send("Not found: " + exchange.getRequestPath());
     }
 
+    Map<String, Object> getItemDataModel(int position) {
+        Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("item", new EventListItem(position, String.valueOf(position + 1000)));
+        return dataModel;
+    }
+
     String renderEventItemAsXml(int position) {
         StringWriter output = renderTemplate("event-list-item-xml.ftl", getItemDataModel(position));
         return compactXml(output.toString());
@@ -54,17 +62,13 @@ class EventItemResource extends AbstractResource {
         return compactJson(output.toString());
     }
 
-    boolean checkHttpError404WithExplanation(HttpServerExchange exchange, Optional<String> contentTypeHeader) {
-        String contentType = contentTypeHeader.orElseThrow();
+    boolean checkHttpError404WithExplanation(HttpServerExchange exchange, String contentType) {
         if (exchange.getQueryParameters().containsKey("404withResponseError")) {
-            String payload;
+            String payload = null;
             if ("application/json".equals(contentType)) {
                 payload = renderHttpError404WithExplanationAsJson();
             } else if ("application/xml".equals(contentType)) {
                 payload = renderHttpError404WithExplanationAsXml();
-            } else {
-                payload = "BodyContains content-type: " + contentType + " not supported: " + exchange.getRequestPath();
-                contentType = "text/plain";
             }
             exchange.setStatusCode(404);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType);

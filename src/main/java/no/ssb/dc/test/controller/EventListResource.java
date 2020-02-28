@@ -4,6 +4,9 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,15 +22,16 @@ class EventListResource extends AbstractResource {
         int stopAt = getQueryParam(exchange.getQueryParameters(), "stopAt", 25);
 
         Optional<String> contentTypeHeader = getContentTypeHeader(exchange);
+        String contentType = contentTypeHeader.orElse("application/json");
 
-        if (contentTypeHeader.isEmpty() || contentTypeHeader.orElseThrow().equals("application/json")) {
+        if ("application/json".equals(contentType)) {
             String payload = renderEventListAsJson(position, pageSize, stopAt);
             exchange.setStatusCode(200);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
             exchange.getResponseSender().send(payload);
             return;
 
-        } else if (contentTypeHeader.orElseThrow().equals("application/xml")) {
+        } else if ("application/xml".equals(contentType)) {
             String linkNextURL = String.format("http://%s:%s%s?position=%s&pageSize=%s%s", exchange.getHostName(), exchange.getHostPort(),
                     exchange.getRequestPath(), position + pageSize, pageSize, stopAt == -1 ? "" : "&stopAt=" + stopAt
             );
@@ -42,6 +46,18 @@ class EventListResource extends AbstractResource {
         exchange.setStatusCode(404);
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
         exchange.getResponseSender().send("Not found: " + exchange.getRequestPath());
+    }
+
+    Map<String, Object> getListDataModel(int fromPosition, int pageSize, int stopAt) {
+        Map<String, Object> dataModel = new HashMap<>();
+        List<EventListItem> list = new ArrayList<>();
+        if (stopAt == -1 || fromPosition < stopAt) {
+            for (int n = fromPosition; n < fromPosition + pageSize; n++) {
+                list.add(new EventListItem(n, String.valueOf(n + 1000)));
+            }
+        }
+        dataModel.put("list", list);
+        return dataModel;
     }
 
     String renderEventListAsXml(int fromPosition, int pageSize, int stopAt, String linkNextURL) {
