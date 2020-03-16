@@ -32,6 +32,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,7 +85,11 @@ abstract class AbstractResource {
     }
 
     int getQueryParam(Map<String, Deque<String>> queryParameters, String paramName, int defaultValue) {
-        String paramValue = queryParameters.computeIfAbsent(paramName, key -> new LinkedList<>(Collections.singletonList(String.valueOf(defaultValue)))).getFirst();
+        String paramValue = queryParameters.containsKey(paramName) ? queryParameters.get(paramName).getFirst() : Integer.toString(defaultValue);
+        if (paramValue != null && paramValue.length() > 0) {
+            paramValue = Integer.toString(defaultValue);
+        }
+        Objects.requireNonNull(paramValue);
         return Integer.parseInt(paramValue);
     }
 
