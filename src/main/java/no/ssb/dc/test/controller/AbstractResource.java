@@ -86,9 +86,6 @@ abstract class AbstractResource {
 
     int getQueryParam(Map<String, Deque<String>> queryParameters, String paramName, int defaultValue) {
         String paramValue = queryParameters.containsKey(paramName) ? queryParameters.get(paramName).getFirst() : Integer.toString(defaultValue);
-        if (paramValue != null && paramValue.length() > 0) {
-            paramValue = Integer.toString(defaultValue);
-        }
         Objects.requireNonNull(paramValue);
         return Integer.parseInt(paramValue);
     }

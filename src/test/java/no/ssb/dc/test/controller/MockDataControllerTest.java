@@ -79,6 +79,12 @@ class MockDataControllerTest {
     }
 
     @Test
+    void testMockItemsFailForStatusCodeAndFailAt() {
+        ResponseHelper<String> eventsResponse = client.get("/api/events/5?failWithStatusCode=404&failAt=5").expect404NotFound();
+        LOG.trace("{}", eventsResponse.body());
+    }
+
+    @Test
     void testMockItemsWith404ErrorResponseAsJson() {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5?404withResponseError").expect404NotFound();
         LOG.trace("{}", eventsResponse.body());

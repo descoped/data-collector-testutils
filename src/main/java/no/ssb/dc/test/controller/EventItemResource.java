@@ -20,6 +20,10 @@ class EventItemResource extends AbstractResource {
         Optional<String> contentTypeHeader = getContentTypeHeader(exchange);
         String contentType = contentTypeHeader.orElse("application/json");
 
+        if (checkFailForStatusCodeAndFailAt(exchange, contentType, position)) {
+            return;
+        }
+
         if ("application/json".equals(contentType)) {
             if (checkHttpError404WithExplanation(exchange, contentType)) {
                 return;
@@ -75,6 +79,19 @@ class EventItemResource extends AbstractResource {
             exchange.getResponseSender().send(payload);
             return true;
         }
+        return false;
+    }
+
+    boolean checkFailForStatusCodeAndFailAt(HttpServerExchange exchange, String contentType, int position) {
+        int failWithStatusCode = getQueryParam(exchange.getQueryParameters(), "failWithStatusCode", -1);
+        int failAt = getQueryParam(exchange.getQueryParameters(), "failAt", -1);
+
+        if (failWithStatusCode > -1 && failAt <= position) {
+            exchange.setStatusCode(failWithStatusCode);
+            exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+            return true;
+        }
+
         return false;
     }
 
