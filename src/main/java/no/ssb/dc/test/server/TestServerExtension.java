@@ -89,14 +89,7 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
         return store.get(fallbackTestConfigurationBinding, TestServerResource.class);
     }
 
-    @Override
-    public void beforeTestExecution(ExtensionContext context) throws Exception {
-        TestConfigurationBinding methodConfigurationBinding = createMethodConfigurationBinding(context);
-        TestConfigurationBinding fallbackTestConfigurationBinding = testServerFactory.findFallbackConfiguration(methodConfigurationBinding);
-
-        LOG.trace("BEGIN {} # {} @ TestServer Binding: {}", context.getRequiredTestClass().getSimpleName(), context.getRequiredTestMethod().getName(), testServerFactory.state(fallbackTestConfigurationBinding));
-
-        ExtensionContext.Store store = getStore(context, fallbackTestConfigurationBinding);
+    private TestServerResource createOrGetTestServerResource(TestConfigurationBinding fallbackTestConfigurationBinding, ExtensionContext.Store store) {
         TestServerResource testServerResource = store.getOrComputeIfAbsent(
                 fallbackTestConfigurationBinding,
                 produce -> {
@@ -105,6 +98,19 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
                 },
                 TestServerResource.class
         );
+        testServerFactory.setCurrentTestServerResource(testServerResource);
+        return testServerResource;
+    }
+
+    @Override
+    public void beforeTestExecution(ExtensionContext context) throws Exception {
+        TestConfigurationBinding methodConfigurationBinding = createMethodConfigurationBinding(context);
+        TestConfigurationBinding fallbackTestConfigurationBinding = testServerFactory.findFallbackConfiguration(methodConfigurationBinding);
+
+        LOG.trace("BEGIN {} # {} @ TestServer Binding: {}", context.getRequiredTestClass().getSimpleName(), context.getRequiredTestMethod().getName(), testServerFactory.state(fallbackTestConfigurationBinding));
+
+        ExtensionContext.Store store = getStore(context, fallbackTestConfigurationBinding);
+        TestServerResource testServerResource = createOrGetTestServerResource(fallbackTestConfigurationBinding, store);
         testServerResource.startIfInactive();
 
         Object testInstance = context.getRequiredTestInstance();

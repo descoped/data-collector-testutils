@@ -1,6 +1,7 @@
 package no.ssb.dc.test.server;
 
 import no.ssb.config.DynamicConfiguration;
+import no.ssb.dc.test.client.TestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,7 @@ import java.net.ServerSocket;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class TestServerFactory {
@@ -19,11 +21,16 @@ public class TestServerFactory {
     private final Map<TestConfigurationBinding, Supplier<TestServer>> testServerSuppliers = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
+    /*
+     * The TestServerExtension maintains current execution test server target in beforeTestExecution
+     */
+    private final AtomicReference<TestServerExtension.TestServerResource> currentTestServerResourceReference = new AtomicReference<>();
+
     TestServerFactory(ConfigurationFactory configurationFactory) {
         this.configurationFactory = configurationFactory;
     }
 
-    static TestServerFactory instance() {
+    public static TestServerFactory instance() {
         return TestServerFactory.TestServerFactorySingleton.INSTANCE;
     }
 
@@ -53,7 +60,7 @@ public class TestServerFactory {
         }
     }
 
-    public State state(TestConfigurationBinding testConfigurationBinding) {
+    State state(TestConfigurationBinding testConfigurationBinding) {
         if (testConfigurationBinding.isContainer()) {
             return State.CONTAINER;
 
@@ -123,7 +130,28 @@ public class TestServerFactory {
         return testServerSuppliers.get(testConfigurationBinding);
     }
 
-    enum State {
+    // see field comment
+    void setCurrentTestServerResource(TestServerExtension.TestServerResource testServerResource) {
+        currentTestServerResourceReference.set(testServerResource);
+    }
+
+    public TestServer currentServer() {
+        TestServerExtension.TestServerResource testServerResource = currentTestServerResourceReference.get();
+        if (testServerResource == null) {
+            throw new IllegalStateException("The test server has yet NOT been created!");
+        }
+        return testServerResource.getServer();
+    }
+
+    public TestClient currentClient() {
+        TestServerExtension.TestServerResource testServerResource = currentTestServerResourceReference.get();
+        if (testServerResource == null) {
+            throw new IllegalStateException("The test server has yet NOT been created!");
+        }
+        return testServerResource.getClient();
+    }
+
+    public enum State {
         CONTAINER,
         CLASS,
         METHOD;
