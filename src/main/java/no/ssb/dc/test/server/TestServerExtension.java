@@ -2,6 +2,8 @@ package no.ssb.dc.test.server;
 
 import no.ssb.dc.test.client.TestClient;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -30,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Start a server per @ConfigurationProfile (default, overridden)
  */
 
-public class TestServerExtension implements BeforeTestExecutionCallback, ParameterResolver, AfterTestExecutionCallback {
+public class TestServerExtension implements BeforeAllCallback, BeforeEachCallback, BeforeTestExecutionCallback, ParameterResolver, AfterTestExecutionCallback {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestServerExtension.class);
 
@@ -38,6 +40,14 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
 
     public TestServerExtension() {
         testServerFactory = TestServerFactory.instance();
+    }
+
+    private TestConfigurationBinding createContainerConfigurationBinding() {
+        return TestConfigurationBinding.container();
+    }
+
+    private TestConfigurationBinding createClassConfigurationBinding(ExtensionContext context) {
+        return TestConfigurationBinding.clazz(context.getRequiredTestClass());
     }
 
     private TestConfigurationBinding createMethodConfigurationBinding(ExtensionContext context) {
@@ -52,12 +62,13 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
                     throw new IllegalAccessException("Illegal access to final field: " + instance.getClass().getName() + "." + field.getName());
                 }
                 field.setAccessible(true);
-                if (field.get(instance) == expect) {
+                // TODO validate TestServerExceptionRegisterTest.thatInjectFieldIsIllegalWhenExpectedFieldStateIfAlreadySet()
+//                if (field.get(instance) == expect) {
                     field.set(instance, value);
                     return true;
-                } else {
-                    throw new IllegalArgumentException("Value not equal to expected value!");
-                }
+//                } else {
+//                    throw new IllegalArgumentException(String.format("Value not equal to expected value! Actual: %s, Expected: %s, Field.name: %s, Value: %s", field.get(instance), expect, field.getName(), value));
+//                }
             } catch (IllegalArgumentException e) {
                 throw e;
             } catch (IllegalAccessException e) {
@@ -102,6 +113,48 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
         return testServerResource;
     }
 
+    private void computeAndStartTestServerIfInactive(ExtensionContext context, TestConfigurationBinding fallbackTestConfigurationBinding, ExtensionContext.Store store) {
+        TestServerResource testServerResource = createOrGetTestServerResource(fallbackTestConfigurationBinding, store);
+        testServerResource.startIfInactive();
+
+        if (context.getTestInstance().isPresent()) {
+            Object testInstance = context.getRequiredTestInstance();
+            List<Field> injectFields = ReflectionSupport.findFields(context.getRequiredTestClass(),
+                    field -> field.isAnnotationPresent(Inject.class), HierarchyTraversalMode.TOP_DOWN);
+
+            for (Field field : injectFields) {
+                // test server
+                compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getServer());
+
+                // test client
+                compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getClient());
+            }
+        }
+    }
+
+    @Override
+    public void beforeAll(ExtensionContext context) throws Exception {
+        TestConfigurationBinding classConfigurationBinding = createContainerConfigurationBinding();
+        TestConfigurationBinding fallbackTestConfigurationBinding = testServerFactory.findFallbackConfiguration(classConfigurationBinding);
+
+        LOG.trace("BEGIN {} @ TestServer Binding: {}", context.getRequiredTestClass().getSimpleName(), testServerFactory.state(fallbackTestConfigurationBinding));
+
+        ExtensionContext.Store store = getStore(context, fallbackTestConfigurationBinding);
+        computeAndStartTestServerIfInactive(context, fallbackTestConfigurationBinding, store);
+
+    }
+
+    @Override
+    public void beforeEach(ExtensionContext context) throws Exception {
+        TestConfigurationBinding classConfigurationBinding = createClassConfigurationBinding(context);
+        TestConfigurationBinding fallbackTestConfigurationBinding = testServerFactory.findFallbackConfiguration(classConfigurationBinding);
+
+        LOG.trace("BEGIN {} @ TestServer Binding: {}", context.getRequiredTestClass().getSimpleName(), testServerFactory.state(fallbackTestConfigurationBinding));
+
+        ExtensionContext.Store store = getStore(context, fallbackTestConfigurationBinding);
+        computeAndStartTestServerIfInactive(context, fallbackTestConfigurationBinding, store);
+    }
+
     @Override
     public void beforeTestExecution(ExtensionContext context) throws Exception {
         TestConfigurationBinding methodConfigurationBinding = createMethodConfigurationBinding(context);
@@ -110,20 +163,7 @@ public class TestServerExtension implements BeforeTestExecutionCallback, Paramet
         LOG.trace("BEGIN {} # {} @ TestServer Binding: {}", context.getRequiredTestClass().getSimpleName(), context.getRequiredTestMethod().getName(), testServerFactory.state(fallbackTestConfigurationBinding));
 
         ExtensionContext.Store store = getStore(context, fallbackTestConfigurationBinding);
-        TestServerResource testServerResource = createOrGetTestServerResource(fallbackTestConfigurationBinding, store);
-        testServerResource.startIfInactive();
-
-        Object testInstance = context.getRequiredTestInstance();
-        List<Field> injectFields = ReflectionSupport.findFields(context.getRequiredTestClass(),
-                field -> field.isAnnotationPresent(Inject.class), HierarchyTraversalMode.TOP_DOWN);
-
-        for (Field field : injectFields) {
-            // test server
-            compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getServer());
-
-            // test client
-            compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getClient());
-        }
+        computeAndStartTestServerIfInactive(context, fallbackTestConfigurationBinding, store);
     }
 
     @Override

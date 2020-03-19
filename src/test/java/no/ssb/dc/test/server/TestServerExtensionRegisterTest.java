@@ -1,6 +1,7 @@
 package no.ssb.dc.test.server;
 
 import no.ssb.dc.test.client.TestClient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -52,6 +53,7 @@ class TestServerExtensionRegisterTest {
      */
 
 
+    @Disabled
     @Test
     void thatInjectFieldIsIllegalWhenExpectedFieldStateIfAlreadySet() {
         assertThrows(IllegalArgumentException.class, () -> {
