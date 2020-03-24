@@ -64,8 +64,8 @@ public class TestServerExtension implements BeforeAllCallback, BeforeEachCallbac
                 field.setAccessible(true);
                 // TODO validate TestServerExceptionRegisterTest.thatInjectFieldIsIllegalWhenExpectedFieldStateIfAlreadySet()
 //                if (field.get(instance) == expect) {
-                    field.set(instance, value);
-                    return true;
+                field.set(instance, value);
+                return true;
 //                } else {
 //                    throw new IllegalArgumentException(String.format("Value not equal to expected value! Actual: %s, Expected: %s, Field.name: %s, Value: %s", field.get(instance), expect, field.getName(), value));
 //                }
@@ -113,23 +113,30 @@ public class TestServerExtension implements BeforeAllCallback, BeforeEachCallbac
         return testServerResource;
     }
 
+    private boolean isContainerContext(ExtensionContext context) {
+        return !context.getTestInstance().isPresent();
+    }
+
     private void computeAndStartTestServerIfInactive(ExtensionContext context, TestConfigurationBinding fallbackTestConfigurationBinding, ExtensionContext.Store store) {
         TestServerResource testServerResource = createOrGetTestServerResource(fallbackTestConfigurationBinding, store);
         testServerResource.startIfInactive();
 
-        if (context.getTestInstance().isPresent()) {
-            Object testInstance = context.getRequiredTestInstance();
-            List<Field> injectFields = ReflectionSupport.findFields(context.getRequiredTestClass(),
-                    field -> field.isAnnotationPresent(Inject.class), HierarchyTraversalMode.TOP_DOWN);
-
-            for (Field field : injectFields) {
-                // test server
-                compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getServer());
-
-                // test client
-                compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getClient());
-            }
+        if (isContainerContext(context)) {
+            return;
         }
+
+        Object testInstance = context.getRequiredTestInstance();
+        List<Field> injectFields = ReflectionSupport.findFields(context.getRequiredTestClass(),
+                field -> field.isAnnotationPresent(Inject.class), HierarchyTraversalMode.TOP_DOWN);
+
+        for (Field field : injectFields) {
+            // test server
+            compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getServer());
+
+            // test client
+            compareAndIfInjectionPointExistsSetFieldValue(null, field, testInstance, testServerResource.getClient());
+        }
+
     }
 
     @Override
