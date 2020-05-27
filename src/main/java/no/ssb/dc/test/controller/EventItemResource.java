@@ -2,6 +2,8 @@ package no.ssb.dc.test.controller;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -9,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 
 class EventItemResource extends AbstractResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EventItemResource.class);
 
     EventItemResource() {
     }
@@ -87,8 +91,10 @@ class EventItemResource extends AbstractResource {
         int failAt = getQueryParam(exchange.getQueryParameters(), "failAt", -1);
 
         if (failWithStatusCode > -1 && failAt <= position) {
+            LOG.error("position={}, failAt={}, failWithStatusCode={}", position, failAt, failWithStatusCode);
             exchange.setStatusCode(failWithStatusCode);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+            exchange.getResponseSender().send("");
             return true;
         }
 

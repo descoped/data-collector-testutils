@@ -70,7 +70,6 @@ class MockDataControllerTest {
         assertEquals(entryList.getLength(), 0);
     }
 
-
     @Test
     void testMockItems() {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5").expect200Ok();
