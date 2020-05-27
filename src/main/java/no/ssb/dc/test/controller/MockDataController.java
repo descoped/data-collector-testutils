@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.Random;
 import java.util.Set;
@@ -26,16 +27,35 @@ public class MockDataController implements Controller {
 
     @Override
     public Set<Request.Method> allowedMethods() {
-        return Set.of(Request.Method.GET);
+        return Set.of(Request.Method.GET, Request.Method.POST);
+    }
+
+    boolean isNotMethod(HttpServerExchange exchange, Request.Method... method) {
+        return List.of(method).stream().noneMatch(m -> m == Request.Method.valueOf(exchange.getRequestMethod().toString()));
+    }
+
+    boolean isAuthorizeResourceWithAccessTokenContext(HttpServerExchange exchange, String endsWithContext) {
+        if (isNotMethod(exchange, Request.Method.POST)) {
+            return false;
+        }
+        String requestPath = exchange.getRequestPath();
+        NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
+        return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == 1 && requestPath.endsWith(endsWithContext);
     }
 
     boolean isListResourceWithContext(HttpServerExchange exchange, String endsWithContext) {
+        if (isNotMethod(exchange, Request.Method.GET)) {
+            return false;
+        }
         String requestPath = exchange.getRequestPath();
         NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
         return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == 1 && requestPath.endsWith(endsWithContext);
     }
 
     boolean isItemResourceWithContext(HttpServerExchange exchange, String endsWithContext, int pathElementCount) {
+        if (isNotMethod(exchange, Request.Method.GET)) {
+            return false;
+        }
         String requestPath = exchange.getRequestPath();
         NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
         return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == pathElementCount && endsWithContext.substring(1).equalsIgnoreCase(pathElements.pollLast());
@@ -48,15 +68,21 @@ public class MockDataController implements Controller {
             return;
         }
 
+        if (isAuthorizeResourceWithAccessTokenContext(exchange, "/authorize")) {
+            LOG.error("--------------------------------------------------------> AUTHORIZE: {}");
+            return;
+        }
+
         if (isListResourceWithContext(exchange, "/events")) {
             new EventListResource().handle(exchange);
             return;
+        }
 
-        } else if (isItemResourceWithContext(exchange, "/events", 2)) {
+        if (isItemResourceWithContext(exchange, "/events", 2)) {
             new EventItemResource().handle(exchange);
             return;
 
-        } else if (isListResourceWithContext(exchange, "/atom")) {
+        } if (isListResourceWithContext(exchange, "/atom")) {
             new AtomFeedResource().handle(exchange);
             return;
         }
