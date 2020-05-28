@@ -42,7 +42,7 @@ class TestServerExtensionRegisterTest {
         assertFalse(injectFields.isEmpty());
         TestServerExtensionTest test = new TestServerExtensionTest();
         assertNull(injectFields.get(0).get(test));
-        assertTrue(extension.compareAndIfInjectionPointExistsSetFieldValue(null, injectFields.get(0), test, TestClient.newClient(null)));
+        assertTrue(extension.compareAndIfInjectionPointExistsSetFieldValue(null, injectFields.get(0), test, TestClient.create(null)));
         assertNotNull(injectFields.get(0).get(test));
     }
 
@@ -60,7 +60,7 @@ class TestServerExtensionRegisterTest {
             List<Field> injectFields = ReflectionSupport.findFields(TestServerExtensionTest.class, field -> field.isAnnotationPresent(Inject.class), HierarchyTraversalMode.TOP_DOWN);
             assertFalse(injectFields.isEmpty());
             TestServerExtensionTest test = new TestServerExtensionTest();
-            extension.compareAndIfInjectionPointExistsSetFieldValue(test, injectFields.get(0), test, TestClient.newClient(null));
+            extension.compareAndIfInjectionPointExistsSetFieldValue(test, injectFields.get(0), test, TestClient.create(null));
         });
     }
 
@@ -75,7 +75,7 @@ class TestServerExtensionRegisterTest {
         assertThrows(IllegalArgumentException.class, () -> {
             List<Field> injectFields = ReflectionSupport.findFields(TestServerExtensionTest.class, field -> field.isAnnotationPresent(Inject.class), HierarchyTraversalMode.TOP_DOWN);
             assertFalse(injectFields.isEmpty());
-            extension.compareAndIfInjectionPointExistsSetFieldValue(null, injectFields.get(0), extension, TestClient.newClient(null));
+            extension.compareAndIfInjectionPointExistsSetFieldValue(null, injectFields.get(0), extension, TestClient.create(null));
         });
     }
 

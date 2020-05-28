@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 
 abstract class AbstractResource {
 
-    abstract void handle(HttpServerExchange exchange);
-
     static byte[] serializeXml(Object document) {
         try (StringWriter writer = new StringWriter()) {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -77,6 +75,8 @@ abstract class AbstractResource {
         return new String(serializeXml(deserializeXml(xml.getBytes())));
     }
 
+    abstract void handle(HttpServerExchange exchange);
+
     Optional<String> getContentTypeHeader(HttpServerExchange exchange) {
         return exchange.getRequestHeaders().getHeaderNames().stream()
                 .filter(queryParam -> "Accept".equalsIgnoreCase(queryParam.toString()) || "Content-Type".equalsIgnoreCase(queryParam.toString()))
@@ -89,9 +89,15 @@ abstract class AbstractResource {
         Objects.requireNonNull(paramValue);
         try {
             return Integer.parseInt(paramValue);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return -1;
         }
+    }
+
+    boolean getQueryParam(Map<String, Deque<String>> queryParameters, String paramName, boolean defaultValue) {
+        boolean paramValue = queryParameters.containsKey(paramName) ? Boolean.parseBoolean(queryParameters.get(paramName).getFirst()) : defaultValue;
+        Objects.requireNonNull(paramValue);
+        return paramValue;
     }
 
     String getQueryParam(Map<String, Deque<String>> queryParameters, String paramName, String defaultValue) {

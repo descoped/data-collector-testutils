@@ -36,7 +36,7 @@ public final class TestClient {
         */
     }
 
-    public static TestClient newClient(TestUriResolver server) {
+    public static TestClient create(TestUriResolver server) {
         return new TestClient(server);
     }
 

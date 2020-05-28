@@ -25,7 +25,7 @@ class AtomFeedResource extends AbstractResource {
 
         if (Integer.parseInt(stopAt) == -1 || Integer.parseInt(fromMarker) < Integer.parseInt(stopAt)) {
             for (int marker = Integer.parseInt(fromMarker); marker < Integer.parseInt(fromMarker) + pageSize; marker++) {
-                EventListItem entry = new EventListItem(marker, String.valueOf(marker));
+                EventListItem entry = new EventListItem(marker, marker);
                 entries.add(entry);
             }
         }

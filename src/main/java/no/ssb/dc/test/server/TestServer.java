@@ -5,6 +5,7 @@ import no.ssb.dc.application.server.UndertowApplication;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.SecureRandom;
 
 public class TestServer implements TestUriResolver {
 
@@ -18,6 +19,10 @@ public class TestServer implements TestUriResolver {
         this.configuration = configuration;
         this.testServerServicePort = testServerServicePort;
         application = UndertowApplication.initializeUndertowApplication(configuration, testServerServicePort);
+    }
+
+    public static TestServer create(DynamicConfiguration configuration) {
+        return new TestServer(configuration, TestServerFactory.findFreePort(new SecureRandom(), 9000, 9499));
     }
 
     public void start() {

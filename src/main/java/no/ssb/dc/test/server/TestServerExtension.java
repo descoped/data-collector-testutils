@@ -210,7 +210,7 @@ public class TestServerExtension implements BeforeAllCallback, BeforeEachCallbac
 
         public TestServerResource(TestServer testServer) {
             this.testServer = testServer;
-            this.testClient = TestClient.newClient(testServer);
+            this.testClient = TestClient.create(testServer);
         }
 
         public TestServer getServer() {

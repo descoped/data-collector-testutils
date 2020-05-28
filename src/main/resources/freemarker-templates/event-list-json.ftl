@@ -1,8 +1,8 @@
 [
 <#list list as item>
     {
-        "id": "${item.id}",
-        "event-id": "${item.eventId}"
+        "id": "${item.id?c}",
+        "event-id": "${item.eventId?c}"
     }<#sep>,</#sep>
 </#list>
 ]

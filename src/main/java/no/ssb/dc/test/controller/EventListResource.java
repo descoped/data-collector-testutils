@@ -2,6 +2,8 @@ package no.ssb.dc.test.controller;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.Map;
 import java.util.Optional;
 
 class EventListResource extends AbstractResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(EventListResource.class);
 
     EventListResource() {
     }
@@ -53,7 +57,7 @@ class EventListResource extends AbstractResource {
         List<EventListItem> list = new ArrayList<>();
         if (stopAt == -1 || fromPosition < stopAt) {
             for (int n = fromPosition; n < fromPosition + pageSize; n++) {
-                list.add(new EventListItem(n, String.valueOf(n + 1000)));
+                list.add(new EventListItem(n, n + EventItem.EVENT_ID_OFFSET));
             }
         }
         dataModel.put("list", list);

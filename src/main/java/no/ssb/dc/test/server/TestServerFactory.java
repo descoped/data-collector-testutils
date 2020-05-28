@@ -35,7 +35,7 @@ public class TestServerFactory {
     }
 
     @SuppressWarnings("SameParameterValue")
-    int findFreePort(Random random, int from, int to) {
+    public static int findFreePort(Random random, int from, int to) {
         int port = pick(random, from, to);
         for (int i = 0; i < 2 * ((to + 1) - from); i++) {
             if (isLocalPortFree(port)) {
@@ -46,11 +46,11 @@ public class TestServerFactory {
         throw new IllegalStateException("Unable to find any available ports in range: [" + from + ", " + (to + 1) + ")");
     }
 
-    int pick(Random random, int from, int to) {
+    static int pick(Random random, int from, int to) {
         return from + random.nextInt((to + 1) - from);
     }
 
-    boolean isLocalPortFree(int port) {
+    static boolean isLocalPortFree(int port) {
         try {
             try (ServerSocket ignore = new ServerSocket(port)) {
                 return true;
