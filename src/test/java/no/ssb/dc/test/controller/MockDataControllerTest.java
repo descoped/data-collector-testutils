@@ -60,6 +60,18 @@ class MockDataControllerTest {
     }
 
     @Test
+    void testMockCursorAtHighPositionForXml() {
+        String cursor = "2500";
+        int size = 10;
+        ResponseHelper<String> eventsResponse = client.get(String.format("/api/events?position=%s&pageSize=%s&stopAt=-1", cursor, size), "Accept", "application/xml").expect200Ok();
+        LOG.trace("{}", eventsResponse.body());
+        Document doc = AbstractResource.deserializeXml(eventsResponse.body().getBytes());
+        Element firstEntry = (Element) doc.getDocumentElement().getElementsByTagName("entry").item(0);
+        assertEquals(firstEntry.getElementsByTagName("id").item(0).getTextContent(), cursor);
+        assertEquals(doc.getDocumentElement().getElementsByTagName("entry").getLength(), size);
+    }
+
+    @Test
     void testMockCursorAndStopAtForXml() {
         String cursor = "31";
         int size = 10;
@@ -69,7 +81,6 @@ class MockDataControllerTest {
         NodeList entryList = doc.getDocumentElement().getElementsByTagName("entry");
         assertEquals(entryList.getLength(), 0);
     }
-
 
     @Test
     void testMockItems() {

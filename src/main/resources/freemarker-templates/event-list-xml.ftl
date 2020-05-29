@@ -7,8 +7,8 @@
     </#if>
     <#list list as item>
     <entry>
-        <id>${item.id}</id>
-        <event-id>${item.eventId}</event-id>
+        <id>${item.id?c}</id>
+        <event-id>${item.eventId?c}</event-id>
     </entry>
     </#list>
 </feed>

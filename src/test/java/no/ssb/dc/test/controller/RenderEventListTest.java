@@ -26,9 +26,9 @@ class RenderEventListTest {
 
     @Test
     void renderXmlItem() {
-        StringWriter output = listResource.renderTemplate("event-list-item-xml.ftl", itemResource.getItemDataModel(1));
+        StringWriter output = listResource.renderTemplate("event-list-item-xml.ftl", itemResource.getItemDataModel(1, true, 250, 8, 200));
         String xml = listResource.compactXml(output.toString());
-        //xml = resource.prettyXml(xml);
+        xml = itemResource.prettyXml(xml);
         System.out.printf("%s%n", xml);
     }
 
@@ -42,7 +42,7 @@ class RenderEventListTest {
 
     @Test
     void renderJsonItem() {
-        StringWriter output = listResource.renderTemplate("event-list-item-json.ftl", itemResource.getItemDataModel(1));
+        StringWriter output = listResource.renderTemplate("event-list-item-json.ftl", itemResource.getItemDataModel(1, true, 250, 8, 200));
         String json = output.toString();
         json = listResource.compactJson(json);
         System.out.printf("%s%n", json);

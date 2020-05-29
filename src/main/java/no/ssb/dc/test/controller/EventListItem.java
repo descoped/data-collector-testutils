@@ -3,9 +3,9 @@ package no.ssb.dc.test.controller;
 public class EventListItem {
 
     private final Integer id;
-    private final String eventId;
+    private final Integer eventId;
 
-    public EventListItem(Integer id, String eventId) {
+    public EventListItem(Integer id, Integer eventId) {
         this.id = id;
         this.eventId = eventId;
     }
@@ -14,7 +14,7 @@ public class EventListItem {
         return id;
     }
 
-    public String getEventId() {
+    public Integer getEventId() {
         return eventId;
     }
 }
