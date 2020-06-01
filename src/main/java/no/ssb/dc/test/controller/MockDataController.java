@@ -17,8 +17,8 @@ import java.util.TreeSet;
 
 public class MockDataController implements Controller {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MockDataController.class);
     static final int ROOT_CONTEXT_PATH_ELEMENT_COUNT = 2; // requestPath is split to: [/, api, events]. Value of 2 means skip [/, api]
+    private static final Logger LOG = LoggerFactory.getLogger(MockDataController.class);
 
     @Override
     public String contextPath() {
@@ -69,7 +69,7 @@ public class MockDataController implements Controller {
         }
 
         if (isAuthorizeResourceWithAccessTokenContext(exchange, "/authorize")) {
-            LOG.error("--------------------------------------------------------> AUTHORIZE: {}");
+            new AuthorizationResource().handle(exchange);
             return;
         }
 
@@ -82,7 +82,8 @@ public class MockDataController implements Controller {
             new EventItemResource().handle(exchange);
             return;
 
-        } if (isListResourceWithContext(exchange, "/atom")) {
+        }
+        if (isListResourceWithContext(exchange, "/atom")) {
             new AtomFeedResource().handle(exchange);
             return;
         }
