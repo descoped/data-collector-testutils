@@ -9,11 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.NavigableSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class MockDataController implements Controller {
 
@@ -39,7 +39,7 @@ public class MockDataController implements Controller {
             return false;
         }
         String requestPath = exchange.getRequestPath();
-        NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
+        Deque<String> pathElements = new LinkedList<>(Arrays.asList(requestPath.split("/")));
         return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == 1 && requestPath.endsWith(endsWithContext);
     }
 
@@ -48,17 +48,19 @@ public class MockDataController implements Controller {
             return false;
         }
         String requestPath = exchange.getRequestPath();
-        NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
+        Deque<String> pathElements = new LinkedList<>(Arrays.asList(requestPath.split("/")));
         return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == 1 && requestPath.endsWith(endsWithContext);
     }
 
-    boolean isItemResourceWithContext(HttpServerExchange exchange, String endsWithContext, int pathElementCount) {
+    boolean isItemResourceWithContext(HttpServerExchange exchange, String startsWithContext, int expectedPathElementCount) {
         if (isNotMethod(exchange, Request.Method.GET)) {
             return false;
         }
         String requestPath = exchange.getRequestPath();
-        NavigableSet<String> pathElements = new TreeSet<>(Arrays.asList(requestPath.split("/")));
-        return pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT == pathElementCount && endsWithContext.substring(1).equalsIgnoreCase(pathElements.pollLast());
+        Deque<String> pathElements = new LinkedList<>(Arrays.asList(requestPath.split("/")));
+        int pathElementCount = pathElements.size() - ROOT_CONTEXT_PATH_ELEMENT_COUNT;
+        pathElements.pollLast();
+        return pathElementCount == expectedPathElementCount && startsWithContext.substring(1).equalsIgnoreCase(pathElements.pollLast());
     }
 
     @Override
