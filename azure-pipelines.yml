@@ -1,5 +1,8 @@
 name: $(Build.SourceBranch)-$(date:yyyyMMdd)$(rev:.r)
 # Pipeline triggers on any branch and tag
+parameters:
+  - name: 'mavenContainer'
+    default: 'maven:3-jdk-11'
 trigger:
   branches:
     include:
@@ -48,7 +51,7 @@ jobs:
     steps:
       # Authenticate Maven to Nexus using predefined Service Connections
       # (Project Settings->Pipelines->Service Connections)
-      - template: maven/task.aythenticate.yml@templates
+      - template: maven/task-authenticate.yml@templates
 
       #Maven caching to speed up pipeline build time
       - template: maven/task-cache.yml@templates
@@ -58,4 +61,5 @@ jobs:
       - template: maven/task-sonar-analyze.yml@templates
 
       # Deploy artifact to Nexus
-      - template: maven/task-install-and-deploy-to-nexus.yml@templates
+      - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/master') }}:
+        - template: maven/task-install-and-deploy-to-nexus.yml@templates
