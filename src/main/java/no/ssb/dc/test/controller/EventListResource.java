@@ -2,10 +2,13 @@ package no.ssb.dc.test.controller;
 
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
+import no.ssb.dc.api.util.CompressUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,7 @@ class EventListResource extends AbstractResource {
 
     @Override
     void handle(HttpServerExchange exchange) {
+        boolean gzip = getQueryParam(exchange.getQueryParameters(), "gzip", false);
         int position = getQueryParam(exchange.getQueryParameters(), "position", 1);
         int pageSize = getQueryParam(exchange.getQueryParameters(), "pageSize", 50);
         int stopAt = getQueryParam(exchange.getQueryParameters(), "stopAt", 25);
@@ -32,7 +36,12 @@ class EventListResource extends AbstractResource {
             String payload = renderEventListAsJson(position, pageSize, stopAt);
             exchange.setStatusCode(200);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            exchange.getResponseSender().send(payload);
+            if (gzip) {
+                ByteBuffer buf = ByteBuffer.wrap(CompressUtils.gzip(payload.getBytes(), new ByteArrayOutputStream()).toByteArray());
+                exchange.getResponseSender().send(buf);
+            } else {
+                exchange.getResponseSender().send(payload);
+            }
             return;
 
         } else if ("application/xml".equals(contentType)) {
@@ -43,7 +52,12 @@ class EventListResource extends AbstractResource {
             String payload = renderEventListAsXml(position, pageSize, stopAt, linkNextURL);
             exchange.setStatusCode(200);
             exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/xml");
-            exchange.getResponseSender().send(payload);
+            if (gzip) {
+                ByteBuffer buf = ByteBuffer.wrap(CompressUtils.gzip(payload.getBytes(), new ByteArrayOutputStream()).toByteArray());
+                exchange.getResponseSender().send(buf);
+            } else {
+                exchange.getResponseSender().send(payload);
+            }
             return;
         }
 
