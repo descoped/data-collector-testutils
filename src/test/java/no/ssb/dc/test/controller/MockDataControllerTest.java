@@ -106,4 +106,19 @@ class MockDataControllerTest {
         ResponseHelper<String> eventsResponse = client.get("/api/events/5?404withResponseError", "Accept", "application/xml").expect404NotFound();
         LOG.trace("{}", eventsResponse.body());
     }
+
+    @Test
+    void testFailUntilGivenNumberOfRetries() throws InterruptedException {
+        String cursor = "1";
+        int size = 10;
+        int retries = 5;
+        ResponseHelper<String> eventsResponse;
+        while ((eventsResponse = client.get(String.format("/api/events?position=%s&pageSize=%s&retries=5", cursor, size))).response().statusCode() == 404) {
+            LOG.debug("Retry @ {}", retries);
+            retries--;
+        }
+        LOG.trace("StatusCode: {}", eventsResponse.response().statusCode());
+        eventsResponse.expect200Ok();
+    }
+
 }

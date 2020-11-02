@@ -14,10 +14,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class EventListResource extends AbstractResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventListResource.class);
+
+    static Map<String, AtomicInteger> urlRetryMap = new ConcurrentHashMap<>();
 
     EventListResource() {
     }
@@ -28,6 +32,21 @@ class EventListResource extends AbstractResource {
         int position = getQueryParam(exchange.getQueryParameters(), "position", 1);
         int pageSize = getQueryParam(exchange.getQueryParameters(), "pageSize", 50);
         int stopAt = getQueryParam(exchange.getQueryParameters(), "stopAt", 25);
+        int retries = getQueryParam(exchange.getQueryParameters(), "retries", -1);
+
+        // schedule resource availability after given number of retries
+        int lastRetryCount;
+        if (retries > -1 && (lastRetryCount = urlRetryMap.computeIfAbsent(exchange.getRequestURL()+"?"+exchange.getQueryString(), counter -> new AtomicInteger(retries)).decrementAndGet()) >= 0) {
+            LOG.trace("lastRetryCount: {}, {}", lastRetryCount, exchange.getRequestURL()+"?"+exchange.getQueryString());
+            if (lastRetryCount == 0) {
+                urlRetryMap.remove(exchange.getRequestURL()+"?"+exchange.getQueryString());
+            } else {
+                exchange.setStatusCode(404);
+                exchange.getResponseSender().send("");
+                return;
+            }
+        }
+
 
         Optional<String> contentTypeHeader = getContentTypeHeader(exchange);
         String contentType = contentTypeHeader.orElse("application/json");
