@@ -11,7 +11,7 @@
     </appender>
 
     <logger name="org.xnio" level="INFO"/>
-    <logger name="no.ssb.dc" level="TRACE"/>
+    <logger name="io.descoped.dc" level="TRACE"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

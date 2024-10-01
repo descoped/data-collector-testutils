@@ -1,8 +1,10 @@
 # Data Collector Testutils
 
+![Build Status](https://img.shields.io/github/actions/workflow/status/descoped/data-collector-testutils/coverage-and-sonar-analysis.yml)
+![Latest Tag](https://img.shields.io/github/v/tag/descoped/data-collector-testutils)
+![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=descoped_data-collector-testutils&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=descoped_data-collector-testutils) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=descoped_data-collector-testutils&metric=coverage)](https://sonarcloud.io/summary/new_code?id=descoped_data-collector-testutils)
+[![Snyk Security Score](https://snyk.io/test/github/descoped/data-collector-testutils/badge.svg)](https://snyk.io/test/github/descoped/data-collector-testutils)
 
-[![Build Status](https://drone.prod-bip-ci.ssb.no/api/badges/statisticsnorway/data-collector-testutils/status.svg)](https://drone.prod-bip-ci.ssb.no/statisticsnorway/data-collector-testutils)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9c83ed6e8d0943609a793b2012879197)](https://www.codacy.com/manual/oranheim/data-collector-testutils?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=statisticsnorway/data-collector-testutils&amp;utm_campaign=Badge_Grade)
-[![codecov](https://codecov.io/gh/statisticsnorway/data-collector-testutils/branch/master/graph/badge.svg)](https://codecov.io/gh/statisticsnorway/data-collector-testutils)
-
-For more information about Data Collector, please refer to the [Data Collector documentation](https://github.com/statisticsnorway/data-collector-project).
+For more information about Data Collector, please refer to
+the [Data Collector documentation](https://github.com/descoped/data-collector-project).
