@@ -12,6 +12,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,7 +41,14 @@ abstract class AbstractResource {
 
     static byte[] serializeXml(Object document) {
         try (StringWriter writer = new StringWriter()) {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            transformerFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+            // Disable external DTDs and stylesheets
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+            Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.transform(new DOMSource((Node) document), new StreamResult(writer));
@@ -60,6 +68,13 @@ abstract class AbstractResource {
             try (ByteArrayInputStream bais = new ByteArrayInputStream(source)) {
                 SAXSource saxSource = new SAXSource(reader, new InputSource(bais));
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
+                // Disable external entities
+                documentBuilderFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                documentBuilderFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                documentBuilderFactory.setExpandEntityReferences(false);
+
                 documentBuilderFactory.setNamespaceAware(false);
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
                 Document doc = documentBuilder.parse(saxSource.getInputSource());
